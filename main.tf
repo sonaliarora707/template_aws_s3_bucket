@@ -1,25 +1,17 @@
 provider "aws" {
-  region     = "eu-central-1"
+  region = "eu-central-1"
 }
 
 resource "aws_s3_bucket" "b" {
-  bucket = "s3-website-test.hashicorp.com"
-  acl    = "public-read"
-  policy = file("policy.json")
+  bucket = "my-tf-test-bucket"
 
-  website {
-    index_document = "index.html"
-    error_document = "error.html"
-
-    routing_rules = <<EOF
-[{
-    "Condition": {
-        "KeyPrefixEquals": "docs/"
-    },
-    "Redirect": {
-        "ReplaceKeyPrefixWith": "documents/"
-    }
-}]
-EOF
+  tags = {
+    Name        = "My bucket"
+    Environment = "Dev"
   }
+}
+
+resource "aws_s3_bucket_acl" "example" {
+  bucket = ""
+  acl    = "private"
 }
