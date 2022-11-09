@@ -12,6 +12,6 @@ resource "aws_s3_bucket" "b" {
 }
 
 resource "aws_s3_bucket_acl" "example" {
-  bucket = ""
+  bucket = "my-tf-test-bucket"
   acl    = "private"
 }
