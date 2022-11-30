@@ -1,17 +1,16 @@
 provider "aws" {
   region = "eu-central-1"
 }
-
 resource "aws_s3_bucket" "b" {
-  bucket = "my-tf-test-bucket"
-
+  bucket = var.bucket_name
   tags = {
     Name        = "My bucket"
     Environment = "Dev"
   }
 }
-
 resource "aws_s3_bucket_acl" "example" {
-  bucket = "my-tf-test-bucket"
+  bucket = aws_s3_bucket.b.id
   acl    = "private"
+}
+variable "bucket_name" {
 }
