@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "b" {
-  bucket = "sg-snail-123"
+  bucket = "test-sg-123-test"
   tags = {
     Name        = "My-bucket-123"
     Environment = "Dev"
