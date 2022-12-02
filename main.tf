@@ -15,6 +15,6 @@ resource "aws_s3_bucket_acl" "example" {
   acl    = "private"
 }
 
-output "bucket_name" {
+output "bucket_drift" {
   value = aws_s3_bucket.b
 }
