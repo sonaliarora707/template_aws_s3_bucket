@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "b" {
-  bucket = "test-sg-123-test"
+  bucket = var.bucket_name
   tags = {
     Name        = "My-bucket-123"
     Environment = "Dev"
@@ -13,6 +13,10 @@ resource "aws_s3_bucket" "b" {
 resource "aws_s3_bucket_acl" "example" {
   bucket = aws_s3_bucket.b.id
   acl    = "private"
+}
+
+variable "bucket_name" {
+  
 }
 
 output "bucket_drift" {
