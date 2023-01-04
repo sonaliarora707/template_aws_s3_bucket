@@ -21,6 +21,6 @@ resource "aws_vpc" "main" {
   instance_tenancy = "default"
 
   tags = {
-    Name = "main"
+    Owner = "stackguardian"
   }
 }
