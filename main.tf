@@ -27,67 +27,44 @@
 #   }
 # }
 
-########## AWS cloudfront provider ############
-resource "aws_s3_bucket" "b" {
-  bucket = "mybucket"
+resource "aws_iam_role" "iam_for_lambda" {
+  name = "iam_for_lambda"
 
-  tags = {
-    Name = "My bucket"
-  }
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
-resource "aws_s3_bucket_acl" "b_acl" {
-  bucket = aws_s3_bucket.b.id
-  acl    = "private"
-}
+resource "aws_lambda_function" "test_lambda" {
+  # If the file is not in the current working directory you will need to include a
+  # path.module in the filename.
+  filename      = "lambda_function_payload.zip"
+  function_name = "lambda_function_name"
+  role          = aws_iam_role.iam_for_lambda.arn
+  handler       = "index.test"
 
-locals {
-  s3_origin_id = "myS3Origin"
-}
+  # The filebase64sha256() function is available in Terraform 0.11.12 and later
+  # For Terraform 0.11.11 and earlier, use the base64sha256() function and the file() function:
+  # source_code_hash = "${base64sha256(file("lambda_function_payload.zip"))}"
+  source_code_hash = filebase64sha256("lambda_function_payload.zip")
 
-resource "aws_cloudfront_distribution" "s3_distribution" {
-  origin_group {
-    origin_id = "groupS3"
+  runtime = "nodejs16.x"
 
-    failover_criteria {
-      status_codes = [403, 404, 500, 502]
-    }
-
-    member {
-      origin_id = "primaryS3"
-    }
-
-    member {
-      origin_id = "failoverS3"
+  environment {
+    variables = {
+      foo = "bar"
     }
   }
-
-  origin {
-    domain_name = aws_s3_bucket.primary.bucket_regional_domain_name
-    origin_id   = "primaryS3"
-
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.default.cloudfront_access_identity_path
-    }
-  }
-
-  origin {
-    domain_name = aws_s3_bucket.failover.bucket_regional_domain_name
-    origin_id   = "failoverS3"
-
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.default.cloudfront_access_identity_path
-    }
-  }
-
-  default_cache_behavior {
-    # ... other configuration ...
-    target_origin_id = "groupS3"
-  }
-
-  tags = {
-    Environment = "production",
-    Owner = "stackguardian"
-  }
-
 }
