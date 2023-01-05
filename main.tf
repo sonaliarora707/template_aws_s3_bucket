@@ -61,6 +61,9 @@ resource "aws_lambda_function" "test_lambda" {
   source_code_hash = filebase64sha256("lambda_function_payload.zip")
 
   runtime = "nodejs16.x"
+  tags = {
+    Name = "efs_for_lambda"
+  }
 
   environment {
     variables = {
